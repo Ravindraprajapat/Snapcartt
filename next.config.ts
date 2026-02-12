@@ -8,7 +8,8 @@ const nextConfig: NextConfig = {
     },
     {hostname:"plus.unsplash.com"},
     {hostname:"images.unsplash.com"},
-    {hostname:"media.istockphoto.com"}
+    {hostname:"media.istockphoto.com"},
+    {hostname:"res.cloudinary.com"}
   ]
  }
 };
