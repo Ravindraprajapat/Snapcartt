@@ -13,6 +13,7 @@ interface Iorder {
       quantity: number;
     },
   ];
+  isPaid: boolean;
   totalAmount: number;
   paymentMethod: "cod" | "online";
   address: {
@@ -61,6 +62,10 @@ const orderSchema = new mongoose.Schema<Iorder>(
         },
       },
     ],
+    isPaid: {
+      type: Boolean,
+      default: false,
+    },
     totalAmount: {
       type: Number,
       required: true,
@@ -89,6 +94,5 @@ const orderSchema = new mongoose.Schema<Iorder>(
   { timestamps: true },
 );
 
-
-const Order = mongoose.models.Order || mongoose.model("Order", orderSchema)
+const Order = mongoose.models.Order || mongoose.model("Order", orderSchema);
 export default Order;

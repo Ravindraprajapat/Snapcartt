@@ -183,6 +183,37 @@ const CheckOut = () => {
     }
   };
 
+  const handleOnlinePayment = async () => {
+    try {
+      const result = await axios.post("/api/user/payment", {
+        userId: userData?._id,
+        items: cartData.map((item) => ({
+          grocery: item._id,
+          name: item.name,
+          price: item.price,
+          unit: item.unit,
+          quantity: item.quantity,
+          image: item.image,
+        })),
+        totalAmount: finalTotal,
+        address: {
+          fullName: address.fullName,
+          mobile: address.mobile,
+          city: address.city,
+          state: address.state,
+          pincode: address.pincode,
+          fullAddress: address.fullAddress,
+          latitude: position ? position[0] : undefined,
+          longitude: position ? position[1] : undefined,
+        },
+        paymentMethod,
+      });
+      window.location.href=result.data.url
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="w-[92%] md:w-[80%] mx-auto py-10 relative">
       <motion.button
@@ -428,8 +459,7 @@ const CheckOut = () => {
               if (paymentMethod === "cod") {
                 handleCod();
               } else {
-                // handleOnline
-                null;
+                handleOnlinePayment();
               }
             }}
           >
