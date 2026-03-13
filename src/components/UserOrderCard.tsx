@@ -87,7 +87,7 @@ const UserOrderCard = ({ order }: { order: Iorder }) => {
         <div className="border-t border-gray-200 pt-3">
           <button
             onClick={() => setExpanded((prev) => !prev)}
-            className="w-full flex justify-between items-center text-sm font-medium text-gray-700 hover:text-green-700 transition"
+            className="w-full flex justify-between items-center text-sm font-medium text-gray-700 hover:text-green-700 transition cursor-pointer"
           >
             <span className="flex items-center gap-2">
               <Package size={16} className="text-green-600" />
