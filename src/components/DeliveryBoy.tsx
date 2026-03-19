@@ -1,10 +1,11 @@
 import React from 'react'
+import DeliveryBoyDashBoard from './DeliveryBoyDashBoard'
 
 const DeliveryBoy = () => {
   return (
-    <div>
-      
-    </div>
+    <>
+      <DeliveryBoyDashBoard/>
+    </>
   )
 }
 

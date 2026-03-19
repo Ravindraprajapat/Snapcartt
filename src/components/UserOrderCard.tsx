@@ -1,4 +1,5 @@
 "use client";
+import { getSocket } from "@/lib/socket";
 import { Iorder } from "@/models/orderModel";
 import {
   ChevronDown,
@@ -10,11 +11,11 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const UserOrderCard = ({ order }: { order: Iorder }) => {
   const [expanded, setExpanded] = useState(false);
-
+  const [status , setStatus] = useState(order.status)
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
@@ -27,6 +28,18 @@ const UserOrderCard = ({ order }: { order: Iorder }) => {
         return "bg-gray-100 text-gray-600 border-gray-300";
     }
   };
+
+  useEffect(()=>{
+  const socket = getSocket()
+   socket?.on("order-status-update",(data)=>{
+    if(data.orderId.toString() === order._id?.toString()){
+      setStatus(data.status)
+    }
+   })
+   return ()=>{
+      socket?.off("order-status-update")
+    }
+  },[])
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
@@ -61,7 +74,7 @@ const UserOrderCard = ({ order }: { order: Iorder }) => {
           <span
             className={`px-3 py-1 text-xs font-semibold border rounded-full ${getStatusColor(order.status)}`}
           >
-            {order.status}
+            {status}
           </span>
         </div>
       </div>
@@ -149,7 +162,7 @@ const UserOrderCard = ({ order }: { order: Iorder }) => {
             <Truck size={16} className="text-green-600" />
             <span>
               Delivery:{" "}
-              <span className="text-green-700 font-semibold">{order.status}</span>
+              <span className="text-green-700 font-semibold">{status}</span>
             </span>
           </div>
 

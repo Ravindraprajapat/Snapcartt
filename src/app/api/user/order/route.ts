@@ -1,4 +1,5 @@
 import connectDb from "@/lib/db";
+import emitEvenHandler from "@/lib/emitEvenHandler";
 import Order from "@/models/orderModel";
 import User from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
@@ -22,6 +23,9 @@ export async function POST(req:NextRequest) {
             totalAmount,
             address
         })
+
+        await emitEvenHandler("new order",newOrder)
+
         return NextResponse.json(newOrder, {status:201})    
     } catch (error) {
          console.log("ORDER ERROR:", error);

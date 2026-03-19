@@ -4,8 +4,12 @@ import { Leaf, ShoppingBasket, Smartphone, Truck } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { getSocket } from "@/lib/socket";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 const HeroSection = () => {
+  
   const slides = [
     {
       id: 1,

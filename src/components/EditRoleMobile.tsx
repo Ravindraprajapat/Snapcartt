@@ -6,11 +6,10 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { set } from "mongoose";
 
 const EditRoleMobile = () => {
-  const [mounted, setMounted] = useState(false);
-
-  const [roles] = useState([
+  const [roles,setRoles] = useState([
     { id: "admin", label: "Admin", icon: UserCog },
     { id: "user", label: "User", icon: User },
     { id: "deliveryBoy", label: "Delivery Boy", icon: Bike },
@@ -22,14 +21,16 @@ const EditRoleMobile = () => {
   const router = useRouter();
   const { update } = useSession();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
   const handleEditRole = async () => {
-    if (!selectedRole || mobile.length !== 10) return;
+    if (!selectedRole) {
+      alert("Please select role");
+      return;
+    }
+
+    if (mobile.length !== 10) {
+      alert("Enter valid mobile number");
+      return;
+    }
 
     try {
       await axios.post("/api/user/edit-role-mobile", {
@@ -41,8 +42,24 @@ const EditRoleMobile = () => {
       router.push("/");
     } catch (error) {
       console.error(error);
+      alert("Something went wrong");
     }
   };
+
+  const checkForAdmin = async () => {
+    try {
+      const result = await axios.get("/api/check-for-admin");
+     if(result.data.adminExist){
+      setRoles(prev=>prev.filter(r=>r.id!=="admin"))
+     }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkForAdmin();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col p-6 items-center w-full">
@@ -84,7 +101,7 @@ const EditRoleMobile = () => {
         transition={{ delay: 0.4 }}
         className="flex flex-col items-center mt-10"
       >
-        <label htmlFor="mobile" className="text-gray-700 font-medium mb-2">
+        <label className="text-gray-700 font-medium mb-2">
           Enter your Mobile number
         </label>
 
@@ -94,9 +111,7 @@ const EditRoleMobile = () => {
             setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))
           }
           inputMode="numeric"
-          autoComplete="off"
           type="tel"
-          id="mobile"
           className="w-64 md:w-80 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-500 focus:outline-none text-gray-800"
           placeholder="XXXXXXXXXX"
         />

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { number } from "motion";
- export interface Iorder {
+export interface Iorder {
   _id?: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   items: [
@@ -26,6 +26,8 @@ import { number } from "motion";
     latitude: number;
     longitude: number;
   };
+  assignment?: mongoose.Types.ObjectId;
+  assignedDeliveryBoy: mongoose.Types.ObjectId;
   status: "pending" | "out of delivery" | "delivered";
   createdAt?: Date;
   updatedAt?: Date;
@@ -84,6 +86,15 @@ const orderSchema = new mongoose.Schema<Iorder>(
       fullAddress: String,
       latitude: Number,
       longitude: Number,
+    },
+    assignment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DeliveryAssignment",
+      default:null
+    },
+    assignedDeliveryBoy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DeliveryBoy",
     },
     status: {
       type: String,
