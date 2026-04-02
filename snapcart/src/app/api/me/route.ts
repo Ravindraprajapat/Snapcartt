@@ -9,30 +9,24 @@ export async function GET(req: NextRequest) {
 
     const session = await auth();
 
-   
     if (!session || !session.user) {
-      return Response.json(
-        { message: "Not authenticated" },
-        { status: 401 }
-      );
+      return Response.json({ message: "Not authenticated" }, { status: 401 });
     }
-
+    console.log("SESSION:", session);
+    console.log("EMAIL:", session?.user?.email);
     const user = await User.findOne({
       email: session.user.email,
     }).select("-password");
 
     if (!user) {
-      return Response.json(
-        { message: "User not found" },
-        { status: 404 }
-      );
+      return Response.json({ message: "User not found" }, { status: 200 });
     }
 
     return Response.json(user, { status: 200 }); // ✅ fixed status
   } catch (error) {
     return Response.json(
       { message: "Internal server error at get userDetails" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

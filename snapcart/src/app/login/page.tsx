@@ -24,8 +24,7 @@ const Login = () => {
     setLoading(true)
     try {
       await signIn("credentials",{
-        email,password,
-        
+        email,password
       },)
      router.push("/")
       setLoading(false)

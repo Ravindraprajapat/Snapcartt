@@ -43,6 +43,12 @@ const RegisterForm = ({ prevStep }: propType) => {
         password,
       });
 
+      await signIn("credentials", {
+      email,
+      password,
+      callbackUrl: "/", // direct home
+    });
+
       router.push("/");
     } catch (error) {
       console.log(error)
