@@ -9,13 +9,18 @@ export async function POST(req: NextRequest, context: any) {
   try {
     await connectDb();
 
-    const { orderId } = context.params;
+    const orderId = context?.params?.orderId;
 
     if (!orderId) {
       return NextResponse.json({ message: "orderId missing" }, { status: 400 });
     }
 
     const { status } = await req.json();
+
+    const validStatus = ["pending", "out of delivery", "delivered"];
+    if (!validStatus.includes(status)) {
+      return NextResponse.json({ message: "Invalid status" }, { status: 400 });
+    }
 
     const order = await Order.findById(orderId).populate("user");
 
@@ -29,14 +34,30 @@ export async function POST(req: NextRequest, context: any) {
 
     if (status === "out of delivery" && !order.assignment) {
       if (!order.address) {
-        return NextResponse.json({ message: "Address not found" }, { status: 400 });
+        await order.save();
+        await emitEvenHandler("order-status-update", {
+          orderId: order._id,
+          status: order.status,
+        });
+        return NextResponse.json(
+          { message: "Order updated (no address)" },
+          { status: 200 }
+        );
       }
 
       const latitude = Number(order.address?.latitude);
       const longitude = Number(order.address?.longitude);
 
       if (isNaN(latitude) || isNaN(longitude)) {
-        return NextResponse.json({ message: "Invalid coordinates" }, { status: 400 });
+        await order.save();
+        await emitEvenHandler("order-status-update", {
+          orderId: order._id,
+          status: order.status,
+        });
+        return NextResponse.json(
+          { message: "Order updated (no location)" },
+          { status: 200 }
+        );
       }
 
       const nearByDeliveryBoys = await User.find({
@@ -73,7 +94,10 @@ export async function POST(req: NextRequest, context: any) {
           orderId: order._id,
           status: order.status,
         });
-        return NextResponse.json({ message: "Delivery boys not available" }, { status: 200 });
+        return NextResponse.json(
+          { message: "Delivery boys not available" },
+          { status: 200 }
+        );
       }
 
       const deliveryAssignment = await DeliveryAssignment.create({
@@ -81,8 +105,6 @@ export async function POST(req: NextRequest, context: any) {
         broadcastedTo: candidates,
         status: "broadcasted",
       });
-
-      await deliveryAssignment.populate("order");
 
       const boys = await User.find({ _id: { $in: candidates } });
 
@@ -101,8 +123,6 @@ export async function POST(req: NextRequest, context: any) {
         latitude: b.location.coordinates[1],
         longitude: b.location.coordinates[0],
       }));
-
-      await deliveryAssignment.populate("order");
     }
 
     await order.save();
@@ -125,7 +145,6 @@ export async function POST(req: NextRequest, context: any) {
     return NextResponse.json({ message: "Status error" }, { status: 500 });
   }
 }
-
 
 
 
