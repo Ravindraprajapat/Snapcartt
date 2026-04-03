@@ -9,7 +9,9 @@ export async function POST(req: NextRequest, context: any) {
   try {
     await connectDb();
 
-    const orderId = context?.params?.orderId;
+   const params = await context.params;
+
+const orderId = params.orderId;
 
     if (!orderId) {
       return NextResponse.json({ message: "orderId missing" }, { status: 400 });
