@@ -90,7 +90,7 @@ export async function POST(req: NextRequest, context: any) {
       for(const boyId of candidates){
         const boy = await User.findById(boyId);
         if(boy.socketId){
-          await emitEvenHandler("new-assignment",deliveryAssignment,boy.sockedId)
+          await emitEvenHandler("new-assignment",deliveryAssignment,boy.socketId)
         }
       }
 
